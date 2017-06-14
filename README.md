@@ -3,6 +3,7 @@
 Use this ansible playbook to setup a fresh server with the following components:
 
 * Nginx
+* Nginx Config for WP Super Cache
 * Certbot (Let's Encrypt)
 * MySQL
 * Memcached
