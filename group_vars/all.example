@@ -1,0 +1,38 @@
+---
+# Server Timzone + Locale
+timezone: Europe/Berlin
+locale: en_US.UTF-8
+
+# General settings
+deploy_server_hostname: INSERT_HOSTNAME
+
+# Sites
+sites_to_set_up:
+  - { url: 'example1.com', name: 'example1', mysql_password: 'INSERT_PASSWORD' }
+  - { url: 'example2.com', name: 'example2', mysql_password: 'INSERT_PASSWORD' }
+  - { url: 'example3.com', name: 'example3', mysql_password: 'INSERT_PASSWORD' }
+
+# Nginx
+nginx_https_enabled: false
+
+# Certbot
+certbot_url: https://dl.eff.org/certbot-auto
+certbot_dir: /opt/certbot
+certbot_email: INSERT_EMAIL
+
+# Postfix
+postfix_myhostname: INSERT_HOSTNAME
+postfix_myorigin: INSERT_HOSTNAME
+postfix_forward: INSERT_EMAIL
+
+# Authorized Hosts
+ssh_public_key_files:
+  - INSERT_PATH_TO_PUBLIC_KEY
+
+# MySQL
+mysql_root_db_password: INSERT_PASSWORD
+
+# Swap
+swap_enabled: true
+swap_file_path: /swapfile
+swap_file_size_kb: 1024

@@ -1,0 +1,32 @@
+---
+- name: Install postfix
+  apt: name=postfix state=latest update_cache=true
+
+- name: Change inet_interfaces
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: '^inet_interfaces = '
+    line: 'inet_interfaces = localhost'
+  notify: restart postfix
+
+- name: Change myhostname
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: '^myhostname = '
+    line: 'myhostname = {{ postfix_myhostname }}'
+  notify: restart postfix
+
+- name: Change myorigin
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: '^myorigin = '
+    line: 'myorigin = {{ postfix_myorigin }}'
+  notify: restart postfix
+
+- name: Forward Mail
+  lineinfile:
+    path: /etc/aliases
+    line: 'root: {{ postfix_forward }}'
+
+- name: Reload aliases
+  command: newaliases

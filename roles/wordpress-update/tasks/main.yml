@@ -1,0 +1,3 @@
+- name: Set www-data:www-data for all webserver files to Update Wordpress
+  command: chown -R www-data /var/www/{{ item.name }}
+  with_items: '{{ sites_to_set_up }}'

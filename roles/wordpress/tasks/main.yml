@@ -1,0 +1,32 @@
+---
+- name: Add users for each site
+  action: 'user name={{ item.name }} shell=/bin/bash'
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Create directories for each site
+  file: path=/var/www/{{ item.name }} state=directory owner={{ item.name }} group=www-data
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set user and group
+  command: chown -R {{ item.name }}:www-data /var/www/{{ item.name }}
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set setgid
+  command: find /var/www/{{ item.name }} -type d -exec chmod g+s {} \;
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set wp-content permissions
+  command: chmod g+w /var/www/{{ item.name }}/wp-content
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set wp-content/themes permissions
+  command: chmod -R g+w /var/www/{{ item.name }}/wp-content/themes
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set wp-content/plugins permissions
+  command: chmod -R g+w /var/www/{{ item.name }}/wp-content/plugins
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set wp-content/cache permissions
+  command: chmod -R g+w /var/www/{{ item.name }}/wp-content/cache
+  with_items: '{{ sites_to_set_up }}'
