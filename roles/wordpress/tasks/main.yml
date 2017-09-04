@@ -7,6 +7,14 @@
   file: path=/var/www/{{ item.name }} state=directory owner={{ item.name }} group=www-data
   with_items: '{{ sites_to_set_up }}'
 
+- name: Set directory rights
+  command: find /var/www/{{ item.name }}/ -type d -exec chmod 755 {} \;
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set file rights
+  command: find /var/www/{{ item.name }}/ -type f -exec chmod 644 {} \;
+  with_items: '{{ sites_to_set_up }}'
+
 - name: Set user and group
   command: chown -R {{ item.name }}:www-data /var/www/{{ item.name }}
   with_items: '{{ sites_to_set_up }}'
@@ -29,4 +37,8 @@
 
 - name: Set wp-content/cache permissions
   command: chmod -R g+w /var/www/{{ item.name }}/wp-content/cache
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set wp-content/uploads permissions
+  command: chmod -R g+w /var/www/{{ item.name }}/wp-content/uploads
   with_items: '{{ sites_to_set_up }}'
