@@ -24,8 +24,8 @@ server {
   client_max_body_size 4G;
 
   ssl on;
-  ssl_certificate /etc/letsencrypt/live/{{ item.name }}/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/{{ item.name }}/privkey.pem;
+  ssl_certificate /etc/letsencrypt/live/{{ item.url }}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/{{ item.url }}/privkey.pem;
   ssl_dhparam /etc/nginx/dhparam.pem;
   ssl_session_timeout 1d;
   ssl_session_cache shared:SSL:50m;
@@ -42,7 +42,7 @@ server {
   # fetch OCSP records from URL in ssl_certificate and cache them
   ssl_stapling on;
   ssl_stapling_verify on;
-  ssl_trusted_certificate /etc/letsencrypt/live/{{ item.name }}/chain.pem;
+  ssl_trusted_certificate /etc/letsencrypt/live/{{ item.url }}/chain.pem;
 
   set $cache_uri $request_uri;
 
