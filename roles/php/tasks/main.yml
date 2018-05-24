@@ -4,37 +4,55 @@
   with_items:
     - php-fpm
     - php-mysql
-    - php7.0-opcache
+    - php-gd
+    - php-xml
+    - php-zip
+    - php-soap
 
 - name: Set cgi.fix_pathinfo=0
   lineinfile:
-    path: /etc/php/7.0/fpm/php.ini
+    path: /etc/php/7.1/fpm/php.ini
     line: 'cgi.fix_pathinfo=0'
+
+- name: Set short_open_tag = On
+  lineinfile:
+    path: /etc/php/7.1/fpm/php.ini
+    line: 'short_open_tag = On'
+
+- name: Set upload_max_filesize
+  lineinfile:
+    path: /etc/php/7.1/fpm/php.ini
+    line: 'upload_max_filesize = 15M'
+
+- name: Set post_max_size
+  lineinfile:
+    path: /etc/php/7.1/fpm/php.ini
+    line: 'post_max_size = 20M'
 
 - name: Set pm.max_children
   lineinfile:
-    path: /etc/php/7.0/fpm/pool.d/www.conf
+    path: /etc/php/7.1/fpm/pool.d/www.conf
     line: 'pm.max_children = 50'
 
 - name: Set pm.start_servers
   lineinfile:
-    path: /etc/php/7.0/fpm/pool.d/www.conf
+    path: /etc/php/7.1/fpm/pool.d/www.conf
     line: 'pm.start_servers = 25'
 
 - name: Set pm.min_spare_servers
   lineinfile:
-    path: /etc/php/7.0/fpm/pool.d/www.conf
+    path: /etc/php/7.1/fpm/pool.d/www.conf
     line: 'pm.min_spare_servers = 10'
 
 - name: Set pm.max_spare_servers
   lineinfile:
-    path: /etc/php/7.0/fpm/pool.d/www.conf
+    path: /etc/php/7.1/fpm/pool.d/www.conf
     line: 'pm.max_spare_servers = 25'
 
 - name: Set pm.max_requests
   lineinfile:
-    path: /etc/php/7.0/fpm/pool.d/www.conf
+    path: /etc/php/7.1/fpm/pool.d/www.conf
     line: 'pm.max_requests = 1000'
 
 - name: restart php
-  service: name=php7.0-fpm state=restarted enabled=yes
+  service: name=php7.1-fpm state=restarted enabled=yes
