@@ -1,7 +1,0 @@
-- name: Create .ssh directories
-  file: path=/home/{{ item.name }}/.ssh/ state=directory mode=0755 owner={{ item.name }} group={{ item.name }}
-  with_items: '{{ sites_to_set_up }}'
-
-- name: Add authorized_keys to users
-  template: src=authorized_keys dest=/home/{{ item.name }}/.ssh/authorized_keys owner={{ item.name }} group={{ item.name }}
-  with_items: '{{ sites_to_set_up }}'

@@ -27,4 +27,3 @@
     - memcached
     - wordpress
     # - wordpress-update
-    - ssh_access
