@@ -34,7 +34,7 @@ sites_to_set_up:
   - {
       url: 'example1.com',
       name: 'example1',
-      user_password: 'INSERT_USER_PASSWORD'
+      user_password: 'INSERT_USER_PASSWORD',
       mysql_password: 'INSERT_PASSWORD',
       nginx_server_name: 'www.example1.com example1.com',
       https: false
@@ -42,7 +42,7 @@ sites_to_set_up:
   - {
       url: 'example2.com',
       name: 'example2',
-      user_password: 'INSERT_USER_PASSWORD'
+      user_password: 'INSERT_USER_PASSWORD',
       mysql_password: 'INSERT_PASSWORD',
       nginx_server_name: 'www.example2.com example2.com',
       https: false
