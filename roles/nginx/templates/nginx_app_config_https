@@ -1,27 +1,21 @@
 server {
   listen 80;
 
+  server_name {{ item.nginx_server_name }};
+
   location / {
-    return 301 https://$host$request_uri;
+    return 301 https://$server_name$request_uri;
   }
 }
 
 server {
   listen 443;
 
-  #auth_basic "Restricted";
-  #auth_basic_user_file /etc/nginx/.htpasswd;
+  server_name {{ item.nginx_server_name }};
 
-  server_name www.{{ item.url }} *.{{ item.url }} {{ item.url }};
-
-  root /var/www/{{ item.name }};
+  root /var/www/{{ item.name }}/www;
   try_files /wp-content/cache/supercache/$http_host/$cache_uri/index.html $uri $uri/ /index.php?$args;
-  index index.php;
-
-  access_log /var/log/nginx/{{ item.name }}.access.log;
-  error_log /var/log/nginx/{{ item.name }}.error.log;
-
-  client_max_body_size 4G;
+  index index.php index.html;
 
   ssl on;
   ssl_certificate /etc/letsencrypt/live/{{ item.url }}/fullchain.pem;
@@ -44,6 +38,11 @@ server {
   ssl_stapling_verify on;
   ssl_trusted_certificate /etc/letsencrypt/live/{{ item.url }}/chain.pem;
 
+  access_log /var/log/nginx/{{ item.name }}.access.log;
+  error_log /var/log/nginx/{{ item.name }}.error.log;
+
+  client_max_body_size {{ nginx_server_client_max_body_size }};
+
   set $cache_uri $request_uri;
 
   # POST requests and URLs with a query string should always go to PHP
@@ -56,7 +55,7 @@ server {
   }
 
   # Don't cache URIs containing the following segments
-  if ($request_uri ~* "(/wp-admin/|/xmlrpc.php|/wp-(app|cron|login|register|mail).php|wp-.*.php|/feed/|index.php|wp-comments-popup.php|wp-links-opml.php|wp-locations.php|sitemap(_index)?.xml|[a-z0-9_-]+-sitemap([0-9]+)?.xml)") {
+  if ($request_uri ~* "(/wp-admin/|/xmlrpc.php|/wp-(app|cron|login|register|mail).php|wp-.*.php|/feed/|tracking|trackingcode|ajax|status|index.php|wp-comments-popup.php|wp-links-opml.php|wp-locations.php|sitemap(_index)?.xml|[a-z0-9_-]+-sitemap([0-9]+)?.xml)") {
     set $cache_uri 'null cache';
   }
 
@@ -66,33 +65,26 @@ server {
   }
 
   location / {
-    try_files /wp-content/cache/supercache/$http_host/$cache_uri/index.html $uri $uri/ /index.php?$args;
+    try_files /wp-content/cache/supercache/$http_host/$cache_uri/index.html $uri $uri/ /index.php?q=$uri&$args;
   }
 
   error_page 404 /404.html;
   error_page 500 502 503 504 /50x.html;
 
   location = /50x.html {
-    root /var/www/{{ item.name }};
+    root /var/www/{{ item.name }}/www;
   }
 
   location ~ \.php$ {
     try_files $uri =404;
-
     fastcgi_split_path_info ^(.+\.php)(/.+)$;
     fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-
-    fastcgi_buffer_size 128k;
-    fastcgi_buffers 256 16k;
-    fastcgi_busy_buffers_size 256k;
-    fastcgi_temp_file_write_size 256k;
-
     include fastcgi_params;
   }
 
-  location ~ /\.ht {
+  location ~ /\. {
     deny all;
   }
 
@@ -101,12 +93,5 @@ server {
     expires max;
     log_not_found off;
     access_log off;
-  }
-
-  # Status for netdata
-  location /stub_status {
-    stub_status;
-    allow 127.0.0.1;
-    deny all;
   }
 }

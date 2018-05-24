@@ -8,7 +8,7 @@
 
 - name: Generate dhparam
   command: openssl dhparam -out /etc/nginx/dhparam.pem 2048
-  when: nginx_https_enabled is defined and nginx_https_enabled == true and dhparam.stat.exists == false
+  when: dhparam.stat.exists == false
 
 - name: Copy nginx.conf configuration
   template: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root
@@ -16,26 +16,31 @@
 - name: Copy nginx configuration (with HTTPS enabled)
   template: src=nginx_app_config_https dest=/etc/nginx/sites-available/{{ item.name }} owner=root group=root
   with_items: '{{ sites_to_set_up }}'
-  when: nginx_https_enabled is defined and nginx_https_enabled == true
+  when: item.https == 'true'
 
 - name: Copy nginx configuration (without HTTPS enabled)
   template: src=nginx_app_config dest=/etc/nginx/sites-available/{{ item.name }} owner=root group=root
   with_items: '{{ sites_to_set_up }}'
-  when: nginx_https_enabled is defined and nginx_https_enabled != true
+  when: item.https != 'true'
 
-- name: Disable default config
-  file: path=/etc/nginx/sites-enabled/default state=absent
+- name: Look for local custom_config
+  local_action: stat path=roles/nginx/templates/custom_config/{{ item.name }}
+  register: has_custom_config
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Copy nginx custom config to remote
+  template: src=roles/nginx/templates/custom_config/{{ item.item.name }} dest=/etc/nginx/sites-available/{{ item.item.name }} owner=root group=root
+  with_items: '{{ has_custom_config.results }}'
+  when: item.stat.exists == true
 
 - name: Symlink to sites-enabled
   file: src=/etc/nginx/sites-available/{{ item.name }} dest=/etc/nginx/sites-enabled/{{ item.name }} owner=root group=root state=link
   with_items: '{{ sites_to_set_up }}'
   notify: restart nginx
 
-- name: Copy htpasswd to nginx
-  template: src=htpasswd dest=/etc/nginx/.htpasswd owner=root group=root
-
 - name: Ensure nginx service is up
   action: service name=nginx state=started
 
 - name: Restart nginx
   command: service nginx restart
+

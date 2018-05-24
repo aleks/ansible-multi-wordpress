@@ -1,13 +1,7 @@
-# Install python and aptitude on the target machines (apt-get install python aptitude)
-# Copy ssh public key to machines (ssh-copy-id user@host)
 ---
 - name: Install Wordpress Server
   hosts: webservers
-  # After initial provisioning, use deploy instead of root
   remote_user: root
-  # remote_user: deploy
-  # become: yes
-  # become_method: sudo
   gather_facts: no # don't gather facts because /usr/bin/python isn't set
   pre_tasks:
     - name: apt-get update
@@ -22,8 +16,19 @@
     - postfix
     - mysql
     - php
-    - nginx
+    - vhosts
     - certbot
+    - nginx
     - memcached
     - wordpress
+
+    # Caution: This should only be applied if you want to update multiple wordpress
+    # installations and want to do it via the WP Admin instead of SFTP.
+    #
+    # Afterwards you should remove the "wordpress-update" role and run the playbook again
+    # to set the correct file and directory rights.
+    #
+    # This role sets all directories to www-data:www-data so wordpress can run it's update
+    # via the admin backend. This is a security risk and should only be used temporarily!
+    #
     # - wordpress-update

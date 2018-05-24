@@ -12,7 +12,7 @@ Use this ansible playbook to setup a fresh server with the following components:
 * Swapfile (useful for small DO instances)
 * Locales
 * Postfix
-* SSH access via authorized\_keys file
+* Adds users for each vhost
 * Tools (tmux, vim, htop, git, wget, curl etc.)
 
 ## Prerequisites & Config

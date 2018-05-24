@@ -1,0 +1,43 @@
+- name: Set permissions for /var/www
+  file: path=/var/www state=directory owner=root group=root mode=0755
+
+- name: Create directories for each site
+  file: path=/var/www/{{ item.name }} state=directory owner=root group=root
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Add users for each site
+  action: user name={{ item.name }} home=/var/www/{{ item.name }} shell=/usr/sbin/nologin password={{ item.user_password|password_hash('sha512') }}
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Add user to sshd_config
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    block: |
+      Match User {{ item.name }}
+        ChrootDirectory /var/www/{{ item.name }}
+        X11Forwarding no
+        AllowTcpForwarding no
+        ForceCommand internal-sftp
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  with_items: '{{ sites_to_set_up }}'
+  notify: restart sshd
+
+- name: Create www directory for each site and set www-data as default group
+  file: path=/var/www/{{ item.name }}/www state=directory owner={{ item.name }} group=www-data mode=g+s
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set directory rights
+  command: find /var/www/{{ item.name }}/www/ -type d -exec chmod 755 {} \;
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set file rights
+  command: find /var/www/{{ item.name }}/www/ -type f -exec chmod 644 {} \;
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set user and group
+  command: chown -R {{ item.name }}:www-data /var/www/{{ item.name }}/www
+  with_items: '{{ sites_to_set_up }}'
+
+- name: Set setgid
+  command: find /var/www/{{ item.name }}/www/ -type d -exec chmod g+s {} \;
+  with_items: '{{ sites_to_set_up }}'

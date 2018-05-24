@@ -1,3 +1,10 @@
-- name: Set www-data:www-data for all webserver files to Update Wordpress
-  command: chown -R www-data /var/www/{{ item.name }}
+---
+- name: Check for wordpress
+  stat: path=/var/www/{{ item.name }}/www/wp-config.php
+  register: has_wordpress
   with_items: '{{ sites_to_set_up }}'
+
+- name: Set www-data:www-data for all webserver files to Update Wordpress
+  command: chown -R www-data /var/www/{{ item.name }}/www
+  with_items: '{{ sites_to_set_up }}'
+  when: item.stat.exists == true

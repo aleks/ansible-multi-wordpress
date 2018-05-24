@@ -6,14 +6,10 @@ locale: en_US.UTF-8
 # General settings
 deploy_server_hostname: INSERT_HOSTNAME
 
-# Sites
-sites_to_set_up:
-  - { url: 'example1.com', name: 'example1', mysql_password: 'INSERT_PASSWORD' }
-  - { url: 'example2.com', name: 'example2', mysql_password: 'INSERT_PASSWORD' }
-  - { url: 'example3.com', name: 'example3', mysql_password: 'INSERT_PASSWORD' }
-
 # Nginx
-nginx_https_enabled: false
+nginx_worker_processes: auto
+nginx_worker_connections: 512
+nginx_server_client_max_body_size: 1m
 
 # Certbot
 certbot_url: https://dl.eff.org/certbot-auto
@@ -35,4 +31,23 @@ mysql_root_db_password: INSERT_PASSWORD
 # Swap
 swap_enabled: true
 swap_file_path: /swapfile
-swap_file_size_kb: 1024
+swap_file_size_kb: 4096
+
+# Sites
+sites_to_set_up:
+  - {
+      url: 'example1.com',
+      name: 'example1',
+      user_password: 'INSERT_USER_PASSWORD'
+      mysql_password: 'INSERT_PASSWORD',
+      nginx_server_name: 'www.example1.com example1.com',
+      https: false
+    }
+  - {
+      url: 'example2.com',
+      name: 'example2',
+      user_password: 'INSERT_USER_PASSWORD'
+      mysql_password: 'INSERT_PASSWORD',
+      nginx_server_name: 'www.example2.com example2.com',
+      https: false
+    }
