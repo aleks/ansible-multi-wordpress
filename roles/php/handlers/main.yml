@@ -1,2 +1,2 @@
 - name: restart php
-  service: name=php7.1-fpm state=restarted enabled=yes
+  service: name=php7.2-fpm state=restarted enabled=yes
