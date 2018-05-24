@@ -1,0 +1,5 @@
+- name: Install unattended-upgrades
+  apt: name=unattended-upgrades state=latest update_cache=true
+
+- name: Enable unattended-upgrades cronjob
+  template: src=20auto-upgrades dest=/etc/apt/apt.conf.d/20auto-upgrades
